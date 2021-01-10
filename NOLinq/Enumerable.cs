@@ -40,6 +40,33 @@ namespace NOLinq
             }
         }
 
+        ///<summary>Returns a subset without elements that are contained within another sequence.</summary>
+        public static IEnumerable<T> Without<T>(this IEnumerable<T> enumerable, IEnumerable<T> enumerableToRemove)
+        {
+            using (IEnumerator<T> enumerator = enumerable.GetEnumerator(), removeEnumerator = enumerableToRemove.GetEnumerator())
+            {
+                while (enumerator.MoveNext())
+                {
+                    bool contains = false;
+
+                    while (removeEnumerator.MoveNext())
+                    {
+                        if (object.Equals(enumerator.Current, removeEnumerator.Current))
+                        {
+                            contains = true;
+                        }
+                    }
+
+                    removeEnumerator.Reset();
+
+                    if (!contains)
+                    {
+                        yield return enumerator.Current;
+                    }
+                }
+            }
+        }
+
         ///<summary>Sorts a sequence of elements of T where T is IComparable of T.</summary>
         public static IEnumerable<T> Sort<T>(this IEnumerable<T> enumerable, SortOption sortOption = SortOption.Default) where T : IComparable<T>
         {
@@ -86,7 +113,7 @@ namespace NOLinq
             return array;
         }
 
-        ///<summary>Sorts a sequence of elements of T given IComparer of T.</summary>
+        ///<summary>Sorts a sequence of elements of T given an IComparer of T.</summary>
         public static IEnumerable<T> Sort<T>(this IEnumerable<T> enumerable, IComparer<T> comparer)
         {
             int count = 0;
@@ -265,7 +292,7 @@ namespace NOLinq
             }
         }
 
-        ///<summary>Applied the specified action for every element in a sequence.</summary>
+        ///<summary>Applies the specified action to every element in a sequence.</summary>
         public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {
             foreach (T variable in enumerable)
@@ -274,7 +301,7 @@ namespace NOLinq
             }
         }
 
-        ///<summary>Applied the specified action for every element in a sequence.</summary>
+        ///<summary>Applies the specified action to every element in a sequence.</summary>
         public static void ForEach<T>(this IEnumerable<T> enumerable, IndexedAction<T> indexedAction)
         {
             int count = 0;
